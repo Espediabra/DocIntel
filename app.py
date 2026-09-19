@@ -1,19 +1,13 @@
-from services.llm_client import LLMClient
+from services.document_service import DocumentService
 
 
-llm = LLMClient()
+document_service = DocumentService()
 
-messages = [
-    {
-        "role": "system",
-        "content": "You are a concise technical assistant. Answer in French.",
-    },
-    {
-        "role": "user",
-        "content": "Explique ce qu'est un LLM en trois phrases.",
-    },
-]
+document = document_service.extract("data/test.pdf")
 
-answer = llm.generate(messages)
+print(f"Document : {document.filename}")
+print(f"Nombre de pages : {document.page_count}")
 
-print(answer)
+for page in document.pages:
+    print(f"\n--- Page {page.page_number} ---")
+    print(page.text[:500])
