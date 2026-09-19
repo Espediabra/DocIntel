@@ -90,10 +90,13 @@ def test_rag_generation():
 
     start = time.perf_counter()
 
-    answer = rag_service.generate_answer(
+    llm_result = rag_service.generate_answer(
         question,
         results,
     )
+
+    answer = llm_result["content"]
+    usage = llm_result["usage"]
 
     generation_time = time.perf_counter() - start
 
@@ -135,6 +138,13 @@ def test_rag_generation():
     print(f"Total       : {total_time:.2f} s")
 
     print("\n" + "=" * 80)
+    
+    print("\nMétriques LLM :")
+    print(f"Prompt tokens     : {usage['prompt_tokens']}")
+    print(f"Completion tokens : {usage['completion_tokens']}")
+    print(f"Total tokens      : {usage['total_tokens']}")
+    print(f"Reasoning tokens  : {usage['reasoning_tokens']}")
+    print(f"Finish reason     : {llm_result['finish_reason']}")
 
     # ============================================================
     # Sauvegarde dans evaluations.json
@@ -180,6 +190,13 @@ def test_rag_generation():
                 "retrieval": round(retrieval_time, 3),
                 "generation": round(generation_time, 3),
                 "total": round(total_time, 3),
+            },
+            "llm_usage": {
+                "prompt_tokens": usage["prompt_tokens"],
+                "completion_tokens": usage["completion_tokens"],
+                "total_tokens": usage["total_tokens"],
+                "reasoning_tokens": usage["reasoning_tokens"],
+                "finish_reason": llm_result["finish_reason"],
             },
             "evaluation": {
                 "grounded": True,

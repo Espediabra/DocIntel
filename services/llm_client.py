@@ -29,4 +29,17 @@ class LLMClient:
 
         data = response.json()
 
-        return data["choices"][0]["message"]["content"]
+        choice = data["choices"][0]
+
+        usage = data.get("usage", {})
+
+        return {
+            "content": choice["message"]["content"],
+            "usage": {
+                "prompt_tokens": usage.get("prompt_tokens"),
+                "completion_tokens": usage.get("completion_tokens"),
+                "total_tokens": usage.get("total_tokens"),
+                "reasoning_tokens": usage.get("reasoning_tokens"),
+            },
+            "finish_reason": choice.get("finish_reason"),
+        }
