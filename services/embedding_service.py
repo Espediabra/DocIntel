@@ -9,9 +9,16 @@ class EmbeddingService:
         self.model = EMBEDDING_MODEL
 
     def embed(self, text: str) -> list[float]:
+        embeddings = self.embed_batch([text])
+        return embeddings[0]
+
+    def embed_batch(self, texts: list[str]) -> list[list[float]]:
+        if not texts:
+            return []
+
         payload = {
             "model": self.model,
-            "input": text,
+            "input": texts,
         }
 
         response = requests.post(
@@ -23,13 +30,28 @@ class EmbeddingService:
 
         data = response.json()
 
-        return data["data"][0]["embedding"]
+        return [
+            item["embedding"]
+            for item in data["data"]
+        ]
 
-    def embed_chunks(self, chunks) -> list[list[float]]:
+    def embed_chunks(
+        self,
+        chunks,
+        batch_size: int = 32,
+    ) -> list[list[float]]:
         embeddings = []
 
-        for chunk in chunks:
-            embedding = self.embed(chunk.text)
-            embeddings.append(embedding)
+        for start in range(0, len(chunks), batch_size):
+            batch = chunks[start:start + batch_size]
+
+            texts = [
+                chunk.text
+                for chunk in batch
+            ]
+
+            batch_embeddings = self.embed_batch(texts)
+
+            embeddings.extend(batch_embeddings)
 
         return embeddings

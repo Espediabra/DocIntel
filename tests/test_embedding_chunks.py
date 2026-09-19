@@ -22,18 +22,25 @@ def test_embed_document_chunks():
 
     embedding_service = EmbeddingService()
 
+    batch_size = 32
+
     start_time = time.perf_counter()
 
-    embeddings = embedding_service.embed_chunks(chunks)
+    embeddings = embedding_service.embed_chunks(
+        chunks,
+        batch_size=batch_size,
+    )
 
     elapsed_time = time.perf_counter() - start_time
 
     print("\n" + "=" * 80)
-    print("DOCUMENT EMBEDDINGS")
+    print("DOCUMENT EMBEDDINGS - BATCHING")
     print("=" * 80)
 
     print(f"Nombre de chunks       : {len(chunks)}")
     print(f"Nombre d'embeddings    : {len(embeddings)}")
+    print(f"Taille du batch        : {batch_size}")
+    print(f"Nombre de requêtes     : {(len(chunks) + batch_size - 1) // batch_size}")
 
     if embeddings:
         print(f"Dimension des vecteurs : {len(embeddings[0])}")
@@ -49,6 +56,7 @@ def test_embed_document_chunks():
     print("=" * 80)
 
     assert len(embeddings) == len(chunks)
+
     assert all(embedding for embedding in embeddings)
 
     assert all(
