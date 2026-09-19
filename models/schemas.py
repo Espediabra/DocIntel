@@ -15,3 +15,10 @@ class Document:
     @property
     def page_count(self) -> int:
         return len(self.pages)
+
+
+@dataclass
+class Chunk:
+    chunk_id: str
+    page_number: int
+    text: str
