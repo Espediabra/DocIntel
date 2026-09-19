@@ -1,28 +1,19 @@
-import requests
+from services.llm_client import LLMClient
 
-url = "http://localhost:1234/v1/chat/completions"
 
-payload = {
-    "model": "qwen2.5-7b-instruct-1m",
-    "messages": [
-        {
-            "role": "system",
-            "content": "You are a concise technical assistant. Answer in French."
-        },
-        {
-            "role": "user",
-            "content": "Explique ce qu'est un LLM en trois phrases."
-        }
-    ],
-    "temperature": 0.2
-}
+llm = LLMClient()
 
-response = requests.post(url, json=payload)
+messages = [
+    {
+        "role": "system",
+        "content": "You are a concise technical assistant. Answer in French.",
+    },
+    {
+        "role": "user",
+        "content": "Explique ce qu'est un LLM en trois phrases.",
+    },
+]
 
-response.raise_for_status()
-
-data = response.json()
-
-answer = data["choices"][0]["message"]["content"]
+answer = llm.generate(messages)
 
 print(answer)
