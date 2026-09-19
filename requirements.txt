@@ -1,3 +1,4 @@
 requests
 PyMuPDF
 pytest
+faiss-cpu
