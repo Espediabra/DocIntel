@@ -6,8 +6,12 @@ payload = {
     "model": "qwen2.5-7b-instruct-1m",
     "messages": [
         {
+            "role": "system",
+            "content": "You are a concise technical assistant. Answer in French."
+        },
+        {
             "role": "user",
-            "content": "Explain RAG in three sentences."
+            "content": "Explique ce qu'est un LLM en trois phrases."
         }
     ],
     "temperature": 0.2
@@ -19,4 +23,6 @@ response.raise_for_status()
 
 data = response.json()
 
-print(data["choices"][0]["message"]["content"])
+answer = data["choices"][0]["message"]["content"]
+
+print(answer)
