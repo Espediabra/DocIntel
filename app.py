@@ -1,0 +1,1 @@
+print("DocIntel environment OK")
