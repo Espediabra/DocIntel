@@ -12,7 +12,7 @@ def test_extract_pdf():
     document = service.extract(str(PDF_PATH))
 
     assert document.filename == str(PDF_PATH)
-    assert document.page_count == 10
+    assert document.page_count == 38
 
 
 def test_pages_have_text():
@@ -20,7 +20,7 @@ def test_pages_have_text():
 
     document = service.extract(str(PDF_PATH))
 
-    assert len(document.pages) == 10
+    assert len(document.pages) == 38
 
     for page in document.pages:
         assert page.page_number >= 1
