@@ -22,3 +22,11 @@ class Chunk:
     chunk_id: str
     page_number: int
     text: str
+
+
+@dataclass
+class SearchResult:
+    chunk_id: str
+    page_number: int
+    text: str
+    score: float
