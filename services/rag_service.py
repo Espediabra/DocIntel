@@ -5,10 +5,11 @@ from services.llm_client import LLMClient
 
 
 class RAGService:
+
     def __init__(
         self,
-        chunks: list[Chunk],
-        embeddings: list[list[float]],
+        chunks,
+        embeddings,
         embedding_service=None,
         faiss_service=None,
         llm_client=None,
@@ -16,33 +17,22 @@ class RAGService:
         self.chunks = chunks
 
         self.embedding_service = (
-            embedding_service
-            or EmbeddingService()
+            embedding_service or EmbeddingService()
         )
 
         dimension = len(embeddings[0])
 
         self.faiss_service = (
-            faiss_service
-            or FAISSService(dimension)
+            faiss_service or FAISSService(dimension)
         )
 
         self.faiss_service.add(embeddings)
 
-        self.llm_client = (
-            llm_client
-            or LLMClient()
-        )
+        self.llm_client = llm_client or LLMClient()
 
-    def retrieve(
-        self,
-        question: str,
-        top_k: int = 5,
-    ) -> list[SearchResult]:
+    def retrieve(self, question, top_k=5):
 
-        query_embedding = self.embedding_service.embed(
-            question
-        )
+        query_embedding = self.embedding_service.embed(question)
 
         distances, indices = self.faiss_service.search(
             query_embedding,
@@ -51,10 +41,8 @@ class RAGService:
 
         results = []
 
-        for distance, index in zip(
-            distances,
-            indices,
-        ):
+        for distance, index in zip(distances, indices):
+
             chunk = self.chunks[index]
 
             results.append(
@@ -67,18 +55,11 @@ class RAGService:
             )
 
         return results
-    
-    def generate_answer(
-        self,
-        question: str,
-        results: list[SearchResult],
-    ) -> str:
+
+    def generate_answer(self, question, results):
 
         context = "\n\n".join(
-            (
-                f"[Page {result.page_number}]\n"
-                f"{result.text}"
-            )
+            f"[Page {result.page_number}]\n{result.text}"
             for result in results
         )
 
@@ -96,23 +77,23 @@ class RAGService:
             },
             {
                 "role": "user",
-                "content": (
-                    f"""
-                        Réponds à la question en utilisant uniquement le contexte fourni.
+                "content": f"""
+Réponds à la question en utilisant uniquement le contexte fourni.
 
-                        QUESTION :
-                        {question}
+QUESTION :
 
-                        CONTEXTE :
-                        {context}
+{question}
 
-                        Consignes :
-                        - Réponds en français.
-                        - Utilise uniquement les informations du contexte.
-                        - Ne complète pas avec des connaissances externes.
-                        - Si le contexte ne permet pas de répondre, indique-le clairement.
-                        """
-                ),
+CONTEXTE :
+
+{context}
+
+Consignes :
+- Réponds en français.
+- Utilise uniquement les informations du contexte.
+- Ne complète pas avec des connaissances externes.
+- Si le contexte ne permet pas de répondre, indique-le clairement.
+""",
             },
         ]
 
